@@ -3,44 +3,48 @@ name: Deploy Flutter Web
 on:
   push:
     branches:
-      - LS_NivelSystem
+      - "**"
 
 permissions:
-  contents: read
+  contents:**ead
   pages: write
-  id-token: write
+  id-token: wr**e
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  **ncel-in-progress: true
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+**build:
+    runs-on: ubuntu-latest**    steps:
+     ** name: Checkout
+        uses**actions/checkout@v4
 
-    steps:
-      - uses: actions/checkout@v4
+      - name**Setup Flutter
+        uses: subos**o/flutter-action@v2
+        with:**         channel: stable
 
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
+      -**ame: Flutter Pub Get
+        run:**lutter pub get
 
-      - run: flutter pub get
+      - name: Bui** Flutter Web
+        run: flutter**uild web --release --base-href /l**nivelsystem/
 
-      - run: flutter build web --release
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
+      - name: Uploa**Pages Artifact
+        uses: acti**s/upload-pages-artifact@v3
+      **with:
           path: build/web
 
-  deploy:
-    environment:
-      name: github-pages
-
-    runs-on: ubuntu-latest
-
+**deploy:
     needs: build
 
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+    run**on: ubuntu-latest
+
+    environmen**
+      name: github-pages
+
+    st**s:
+      - name: Deploy to GitHub**ages
+        id: deployment
+     ** uses: actions/deploy-pages@v4
+``**
