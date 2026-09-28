@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../core/utils/branza_formatter.dart';
 import '../../core/utils/unit_formatter.dart';
+import '../../models/branza.dart';
 import '../../models/budowa.dart';
-import '../../models/pomiar.dart';
+import '../../models/pomiar_punktowy.dart';
 import '../../models/stanowisko.dart';
+import '../../models/typ_punktu.dart';
+import '../../services/persistence_service.dart';
 
 class CreatePomiarScreen extends StatefulWidget {
   final Budowa budowa;
@@ -31,7 +35,51 @@ class _CreatePomiarScreenState
   final odczytController =
       TextEditingController();
 
+  Branza branza =
+      Branza.kanalizacjaSanitarna;
+
+  TypPunktu typ =
+      TypPunktu.studnia;
+
   double rzedna = 0;
+
+  List<TypPunktu> getDostepneTypy() {
+    switch (branza) {
+      case Branza.kanalizacjaSanitarna:
+      case Branza.kanalizacjaDeszczowa:
+        return [
+          TypPunktu.studnia,
+          TypPunktu.wpust,
+          TypPunktu.punkt,
+          TypPunktu.inne,
+        ];
+
+      case Branza.wodociag:
+        return [
+          TypPunktu.hydrant,
+          TypPunktu.zasuwa,
+          TypPunktu.punkt,
+          TypPunktu.inne,
+        ];
+
+      case Branza.drogowa:
+        return [
+          TypPunktu.kraweznik,
+          TypPunktu.chodnik,
+          TypPunktu.punkt,
+          TypPunktu.inne,
+        ];
+
+      case Branza.kabel:
+        return [
+          TypPunktu.punkt,
+          TypPunktu.inne,
+        ];
+
+      case Branza.inne:
+        return TypPunktu.values;
+    }
+  }
 
   void pokazBlad(
     String komunikat,
@@ -39,14 +87,19 @@ class _CreatePomiarScreenState
     ScaffoldMessenger.of(context)
         .showSnackBar(
       SnackBar(
-        content: Text(komunikat),
-        backgroundColor: Colors.red,
+        content: Text(
+          komunikat,
+        ),
+        backgroundColor:
+            Colors.red,
       ),
     );
   }
 
   bool waliduj() {
-    if (kodController.text.trim().isEmpty) {
+    if (kodController.text
+        .trim()
+        .isEmpty) {
       pokazBlad(
         'Podaj kod punktu',
       );
@@ -89,32 +142,44 @@ class _CreatePomiarScreenState
         ) ??
         0;
 
-    setState(() {
-      rzedna =
-          widget.stanowisko.osCelowa -
-          odczyt;
-    });
+    setState(
+      () {
+        rzedna =
+            widget.stanowisko.osCelowa -
+                odczyt;
+      },
+    );
   }
 
-  void zapisz() {
-    if (!waliduj()) return;
+  Future<void> zapisz() async {
+    if (!waliduj()) {
+      return;
+    }
 
     final odczyt = double.parse(
       odczytController.text
           .replaceAll(',', '.'),
     );
 
-    widget.budowa.pomiary.add(
-      Pomiar(
-        kodPunktu: kodController.text,
-        opis: opisController.text,
-        stanowisko: widget.stanowisko,
+    widget.budowa.pomiaryPunktowe.add(
+      PomiarPunktowy(
+        branza: branza,
+        typ: typ,
+        kod: kodController.text.trim(),
+        opis: opisController.text.trim(),
+        stanowisko:
+            widget.stanowisko,
         odczyt: odczyt,
         rzedna: rzedna,
         data: DateTime.now(),
-        odcinek: null,
       ),
     );
+
+    await PersistenceService.save();
+
+    if (!context.mounted) {
+      return;
+    }
 
     Navigator.pop(
       context,
@@ -123,7 +188,9 @@ class _CreatePomiarScreenState
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -131,7 +198,8 @@ class _CreatePomiarScreenState
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding:
+            const EdgeInsets.all(16),
         children: [
           Card(
             child: ListTile(
@@ -153,7 +221,9 @@ class _CreatePomiarScreenState
               ),
               subtitle: Text(
                 UnitFormatter.osCelowa(
-                  widget.stanowisko.osCelowa,
+                  widget
+                      .stanowisko
+                      .osCelowa,
                 ),
               ),
             ),
@@ -161,19 +231,93 @@ class _CreatePomiarScreenState
 
           const SizedBox(height: 20),
 
-          TextField(
-            controller: kodController,
+          DropdownButtonFormField<Branza>(
+            initialValue: branza,
+            decoration:
+                const InputDecoration(
+              labelText: 'Branża',
+            ),
+            items: Branza.values
+                .map(
+                  (e) =>
+                      DropdownMenuItem(
+                    value: e,
+                    child: Text(
+                      BranzaFormatter
+                          .nazwa(
+                        e,
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+            onChanged: (value) {
+              if (value == null) {
+                return;
+              }
+
+              setState(
+                () {
+                  branza = value;
+                  typ =
+                      getDostepneTypy()
+                          .first;
+                },
+              );
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          DropdownButtonFormField<
+              TypPunktu>(
+            initialValue: typ,
             decoration:
                 const InputDecoration(
               labelText:
-                  'Kod punktu (K1, W1, S1...)',
+                  'Typ punktu',
+            ),
+            items: getDostepneTypy()
+                .map(
+                  (e) =>
+                      DropdownMenuItem(
+                    value: e,
+                    child: Text(
+                      e.name,
+                    ),
+                  ),
+                )
+                .toList(),
+            onChanged: (value) {
+              if (value == null) {
+                return;
+              }
+
+              setState(
+                () {
+                  typ = value;
+                },
+              );
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          TextField(
+            controller:
+                kodController,
+            decoration:
+                const InputDecoration(
+              labelText:
+                  'Kod punktu',
             ),
           ),
 
           const SizedBox(height: 16),
 
           TextField(
-            controller: opisController,
+            controller:
+                opisController,
             decoration:
                 const InputDecoration(
               labelText: 'Opis',
@@ -183,14 +327,17 @@ class _CreatePomiarScreenState
           const SizedBox(height: 16),
 
           TextField(
-            controller: odczytController,
+            controller:
+                odczytController,
             keyboardType:
                 TextInputType.number,
             decoration:
                 const InputDecoration(
-              labelText: 'Odczyt [m]',
+              labelText:
+                  'Odczyt [m]',
             ),
-            onChanged: (_) => przelicz(),
+            onChanged: (_) =>
+                przelicz(),
           ),
 
           const SizedBox(height: 20),
@@ -210,10 +357,13 @@ class _CreatePomiarScreenState
 
           const SizedBox(height: 24),
 
-          FilledButton(
+          FilledButton.icon(
             onPressed: zapisz,
-            child: const Text(
-              'Zapisz pomiar',
+            icon: const Icon(
+              Icons.save,
+            ),
+            label: const Text(
+              'ZAPISZ POMIAR',
             ),
           ),
         ],

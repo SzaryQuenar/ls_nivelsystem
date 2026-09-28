@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/odcinek.dart';
 import '../../models/rura.dart';
+import '../../services/persistence_service.dart';
 
 class CreateRuraScreen extends StatefulWidget {
   final Odcinek odcinek;
@@ -98,7 +99,7 @@ class _CreateRuraScreenState
     setState(() {});
   }
 
-  void zapisz() {
+  Future<void> zapisz() async {
     final dlugosc =
         double.tryParse(
               dlugoscController.text
@@ -138,6 +139,12 @@ class _CreateRuraScreenState
         data: DateTime.now(),
       ),
     );
+
+    await PersistenceService.save();
+    
+    if (!context.mounted) {
+      return;
+    }
 
     Navigator.pop(
       context,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/budowa.dart';
 import '../../models/reper.dart';
+import '../../services/persistence_service.dart';
 
 class CreateReperScreen extends StatefulWidget {
   final Budowa budowa;
@@ -127,24 +128,26 @@ class _CreateReperScreenState
           const SizedBox(height: 24),
 
           FilledButton(
-            onPressed: () {
+            onPressed: () async {
               widget.budowa.repery.add(
                 Reper(
                   numer: getNextNumber(),
                   typ: typ,
                   rzedna:
                       double.tryParse(
-                            rzednaController
-                                .text
-                                .replaceAll(
-                                  ',',
-                                  '.',
-                                ),
+                            rzednaController.text
+                                .replaceAll(',', '.'),
                           ) ??
                           0,
                   opis: opisController.text,
                 ),
               );
+
+              await PersistenceService.save();
+
+              if (!context.mounted) {
+                return;
+              }
 
               Navigator.pop(
                 context,

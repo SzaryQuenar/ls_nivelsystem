@@ -7,6 +7,7 @@ import '../../models/budowa.dart';
 import '../../models/pomiar_punktowy.dart';
 import '../../models/stanowisko.dart';
 import '../../models/typ_punktu.dart';
+import '../../services/persistence_service.dart';
 
 class CreatePomiarPunktowyScreen
     extends StatefulWidget {
@@ -94,7 +95,7 @@ class _CreatePomiarPunktowyScreenState
     setState(() {});
   }
 
-  void zapisz() {
+  Future<void> zapisz() async {
     if (kod.trim().isEmpty) {
       return;
     }
@@ -125,13 +126,18 @@ class _CreatePomiarPunktowyScreenState
         typ: typ,
         kod: kod,
         opis: opisController.text,
-        stanowisko:
-            widget.stanowisko,
+        stanowisko: widget.stanowisko,
         odczyt: odczyt,
         rzedna: rzedna,
         data: DateTime.now(),
       ),
     );
+
+    await PersistenceService.save();
+
+    if (!context.mounted) {
+      return;
+    }
 
     Navigator.pop(
       context,

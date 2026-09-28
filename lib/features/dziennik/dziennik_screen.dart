@@ -113,8 +113,8 @@ class DziennikScreen extends StatelessWidget {
                         final pomiaryBranzy =
                             budowa.pomiaryPunktowe.where(
                           (p) =>
-                              p.stanowisko ==
-                                  stanowisko &&
+                              p.stanowisko.numer ==
+                                  stanowisko.numer && 
                               p.branza ==
                                   branza,
                         ).toList();
@@ -122,8 +122,8 @@ class DziennikScreen extends StatelessWidget {
                         final odcinkiBranzy =
                             budowa.odcinki.where(
                           (o) =>
-                              o.stanowisko ==
-                                  stanowisko &&
+                              o.stanowisko.numer ==
+                                  stanowisko.numer && 
                               o.branza ==
                                   branza,
                         ).toList();

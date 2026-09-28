@@ -7,6 +7,7 @@ import '../../models/budowa.dart';
 import '../../models/odcinek.dart';
 import '../../models/stanowisko.dart';
 import '../../models/typ_odcinka.dart';
+import '../../services/persistence_service.dart';
 
 class CreateOdcinekScreen extends StatefulWidget {
   final Budowa budowa;
@@ -123,7 +124,7 @@ class _CreateOdcinekScreenState
     return true;
   }
 
-  void zapisz() {
+  Future<void> zapisz() async {
     if (!waliduj()) {
       return;
     }
@@ -150,6 +151,12 @@ class _CreateOdcinekScreenState
       ),
     );
 
+    await PersistenceService.save();
+
+    if (!context.mounted) {
+      return;
+    }
+    
     Navigator.pop(
       context,
       true,

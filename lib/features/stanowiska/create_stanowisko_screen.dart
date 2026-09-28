@@ -4,6 +4,7 @@ import '../../models/budowa.dart';
 import '../../models/reper.dart';
 import '../../models/stanowisko.dart';
 import '../../core/utils/unit_formatter.dart';
+import '../../services/persistence_service.dart';
 
 
 class CreateStanowiskoScreen extends StatefulWidget {
@@ -99,7 +100,7 @@ class _CreateStanowiskoScreenState
     return 'S${widget.budowa.stanowiska.length + 1}';
   }
 
-  void zapisz() {
+  Future<void> zapisz() async {
     if (!walidujOdczytWstecz()) {
       return;
     }
@@ -118,6 +119,12 @@ class _CreateStanowiskoScreenState
         data: DateTime.now(),
       ),
     );
+
+    await PersistenceService.save();
+
+    if (!context.mounted) {
+      return;
+    }
 
     Navigator.pop(
       context,
