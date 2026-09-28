@@ -6,45 +6,47 @@ on:
       - "**"
 
 permissions:
-  contents:**ead
+  contents: read
   pages: write
-  id-token: wr**e
+  id-token: write
 
 concurrency:
   group: pages
-  **ncel-in-progress: true
+  cancel-in-progress: true
 
 jobs:
-**build:
-    runs-on: ubuntu-latest**    steps:
-     ** name: Checkout
-        uses**actions/checkout@v4
+  build:
+    runs-on: ubuntu-latest
 
-      - name**Setup Flutter
-        uses: subos**o/flutter-action@v2
-        with:**         channel: stable
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      -**ame: Flutter Pub Get
-        run:**lutter pub get
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
 
-      - name: Bui** Flutter Web
-        run: flutter**uild web --release --base-href /l**nivelsystem/
+      - name: Flutter Pub Get
+        run: flutter pub get
 
-      - name: Uploa**Pages Artifact
-        uses: acti**s/upload-pages-artifact@v3
-      **with:
+      - name: Build Flutter Web
+        run: flutter build web --release --base-href /ls_nivelsystem/
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
           path: build/web
 
-**deploy:
+  deploy:
     needs: build
 
-    run**on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-    environmen**
+    environment:
       name: github-pages
 
-    st**s:
-      - name: Deploy to GitHub**ages
+    steps:
+      - name: Deploy to GitHub Pages
         id: deployment
-     ** uses: actions/deploy-pages@v4
-``**
+        uses: actions/deploy-pages@v4
