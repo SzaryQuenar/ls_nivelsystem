@@ -110,8 +110,7 @@ class _ProjektowanyOdczytScreenState
           TextField(
             controller:
                 odczytStartController,
-            keyboardType:
-                TextInputType.number,
+            keyboardType: TextInputType.text,
             decoration:
                 const InputDecoration(
               labelText:
