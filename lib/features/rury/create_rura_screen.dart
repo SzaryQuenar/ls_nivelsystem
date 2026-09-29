@@ -203,10 +203,7 @@ class _CreateRuraScreenState
           TextField(
             controller:
                 dlugoscController,
-            keyboardType:
-                const TextInputType.numberWithOptions(
-              decimal: true,
-              ),
+            keyboardType: TextInputType.text,
             decoration:
                 const InputDecoration(
               labelText:
@@ -250,10 +247,7 @@ class _CreateRuraScreenState
           TextField(
             controller:
                 odczytStartController,
-            keyboardType:
-                const TextInputType.numberWithOptions(
-              decimal: true,
-              ),
+            keyboardType: TextInputType.text,
             decoration:
                 const InputDecoration(
               labelText:
@@ -269,10 +263,7 @@ class _CreateRuraScreenState
             TextField(
               controller:
                   spadekController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(
-              decimal: true,
-              ),
+              keyboardType: TextInputType.text,
               decoration:
                   const InputDecoration(
                 labelText:
@@ -286,10 +277,7 @@ class _CreateRuraScreenState
             TextField(
               controller:
                   odczytKoniecController,
-              keyboardType:
-                  const TextInputType.numberWithOptions(
-              decimal: true,
-              ),
+              keyboardType: TextInputType.text,
               decoration:
                   const InputDecoration(
                 labelText:

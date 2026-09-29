@@ -173,10 +173,7 @@ class _CreateStanowiskoScreenState
           TextField(
             controller:
                 odczytWsteczController,
-            keyboardType:
-                const TextInputType.numberWithOptions(
-            decimal: true,
-            ),
+            keyboardType: TextInputType.text,
             decoration:
                 const InputDecoration(
               labelText:

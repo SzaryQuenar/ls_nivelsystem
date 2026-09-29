@@ -329,10 +329,7 @@ class _CreatePomiarScreenState
           TextField(
             controller:
                 odczytController,
-            keyboardType:
-                const TextInputType.numberWithOptions(
-            decimal: true,
-            ),
+            keyboardType: TextInputType.text,
             decoration:
                 const InputDecoration(
               labelText:
