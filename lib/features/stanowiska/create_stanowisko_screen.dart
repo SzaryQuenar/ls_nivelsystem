@@ -5,7 +5,7 @@ import '../../models/reper.dart';
 import '../../models/stanowisko.dart';
 import '../../core/utils/unit_formatter.dart';
 import '../../services/persistence_service.dart';
-
+import '../../widgets/geo_numeric_keyboard.dart';
 
 class CreateStanowiskoScreen extends StatefulWidget {
   final Budowa budowa;
@@ -29,6 +29,8 @@ class _CreateStanowiskoScreenState
 
   double osCelowa = 0;
 
+  bool pokazKlawiature = false;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +39,12 @@ class _CreateStanowiskoScreenState
       selectedReper =
           widget.budowa.repery.first;
     }
+  }
+
+  @override
+  void dispose() {
+    odczytWsteczController.dispose();
+    super.dispose();
   }
 
   void pokazBlad(
@@ -82,7 +90,9 @@ class _CreateStanowiskoScreenState
   }
 
   void przelicz() {
-    if (selectedReper == null) return;
+    if (selectedReper == null) {
+      return;
+    }
 
     final odczyt = double.tryParse(
           odczytWsteczController.text
@@ -92,7 +102,8 @@ class _CreateStanowiskoScreenState
 
     setState(() {
       osCelowa =
-          selectedReper!.rzedna + odczyt;
+          selectedReper!.rzedna +
+              odczyt;
     });
   }
 
@@ -141,11 +152,13 @@ class _CreateStanowiskoScreenState
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding:
+            const EdgeInsets.all(16),
         children: [
           DropdownButtonFormField<Reper>(
             initialValue: selectedReper,
-            decoration: const InputDecoration(
+            decoration:
+                const InputDecoration(
               labelText: 'Reper',
             ),
             items: widget.budowa.repery
@@ -154,7 +167,7 @@ class _CreateStanowiskoScreenState
                       DropdownMenuItem(
                     value: reper,
                     child: Text(
-                      '${reper.numer} (${UnitFormatter.rzedna(reper.rzedna)})'
+                      '${reper.numer} (${UnitFormatter.rzedna(reper.rzedna)})',
                     ),
                   ),
                 )
@@ -173,14 +186,39 @@ class _CreateStanowiskoScreenState
           TextField(
             controller:
                 odczytWsteczController,
-            keyboardType: TextInputType.text,
+            readOnly: true,
+            showCursor: true,
+            onTap: () {
+              setState(() {
+                pokazKlawiature =
+                    true;
+              });
+            },
             decoration:
                 const InputDecoration(
               labelText:
                   'Odczyt wstecz [m]',
+              suffixIcon: Icon(
+                Icons.calculate,
+              ),
             ),
-            onChanged: (_) => przelicz(),
           ),
+
+          const SizedBox(height: 12),
+
+          if (pokazKlawiature)
+            GeoNumericKeyboard(
+              controller:
+                  odczytWsteczController,
+              onDone: () {
+                przelicz();
+
+                setState(() {
+                  pokazKlawiature =
+                      false;
+                });
+              },
+            ),
 
           const SizedBox(height: 20),
 

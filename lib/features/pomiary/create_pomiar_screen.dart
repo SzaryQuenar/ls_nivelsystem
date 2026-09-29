@@ -8,6 +8,7 @@ import '../../models/pomiar_punktowy.dart';
 import '../../models/stanowisko.dart';
 import '../../models/typ_punktu.dart';
 import '../../services/persistence_service.dart';
+import '../../widgets/geo_numeric_keyboard.dart';
 
 class CreatePomiarScreen extends StatefulWidget {
   final Budowa budowa;
@@ -42,6 +43,7 @@ class _CreatePomiarScreenState
       TypPunktu.studnia;
 
   double rzedna = 0;
+  bool pokazKlawiature = false;
 
   List<TypPunktu> getDostepneTypy() {
     switch (branza) {
@@ -149,6 +151,14 @@ class _CreatePomiarScreenState
                 odczyt;
       },
     );
+  }
+
+  @override
+  void dispose() {
+    kodController.dispose();
+    opisController.dispose();
+    odczytController.dispose();
+    super.dispose();
   }
 
   Future<void> zapisz() async {
@@ -329,15 +339,35 @@ class _CreatePomiarScreenState
           TextField(
             controller:
                 odczytController,
-            keyboardType: TextInputType.text,
+            readOnly: true,
+            showCursor: true,
+            onTap: () {
+              setState(() {
+                pokazKlawiature = true;
+              });
+            },
             decoration:
                 const InputDecoration(
-              labelText:
-                  'Odczyt [m]',
+              labelText: 'Odczyt [m]',
+              suffixIcon: Icon(
+                Icons.calculate,
+              ),
             ),
-            onChanged: (_) =>
-                przelicz(),
           ),
+
+          const SizedBox(height: 12),
+
+          if (pokazKlawiature)
+            GeoNumericKeyboard(
+              controller: odczytController,
+              onDone: () {
+                przelicz();
+
+                setState(() {
+                  pokazKlawiature = false;
+                });
+              },
+            ),
 
           const SizedBox(height: 20),
 

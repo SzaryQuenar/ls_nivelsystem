@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/budowa.dart';
 import '../../models/reper.dart';
 import '../../core/utils/unit_formatter.dart';
+import '../../widgets/geo_numeric_keyboard.dart';
 
 class PrzeniesienieReperaScreen
     extends StatefulWidget {
@@ -33,6 +34,10 @@ class _PrzeniesienieReperaScreenState
 
   double nowyReper = 0;
 
+  bool pokazKlawiature = false;
+
+  TextEditingController? aktywnyController;
+
   @override
   void initState() {
     super.initState();
@@ -46,8 +51,17 @@ class _PrzeniesienieReperaScreenState
     }
   }
 
+  @override
+  void dispose() {
+    odczytWsteczController.dispose();
+    odczytWPrzodController.dispose();
+    super.dispose();
+  }
+
   void przelicz() {
-    if (selectedReper == null) return;
+    if (selectedReper == null) {
+      return;
+    }
 
     final wstecz =
         double.tryParse(
@@ -66,8 +80,7 @@ class _PrzeniesienieReperaScreenState
     osCelowa =
         selectedReper!.rzedna + wstecz;
 
-    nowyReper =
-        osCelowa - przod;
+    nowyReper = osCelowa - przod;
 
     setState(() {});
   }
@@ -83,10 +96,11 @@ class _PrzeniesienieReperaScreenState
 
       final match =
           RegExp(r'(\d+)$')
-              .firstMatch(
-                  reper.numer);
+              .firstMatch(reper.numer);
 
-      if (match == null) continue;
+      if (match == null) {
+        continue;
+      }
 
       final numer =
           int.tryParse(
@@ -103,6 +117,10 @@ class _PrzeniesienieReperaScreenState
   }
 
   void zapisz() {
+    if (selectedReper == null) {
+      return;
+    }
+
     widget.budowa.repery.add(
       Reper(
         numer: generateRRNumber(),
@@ -132,7 +150,8 @@ class _PrzeniesienieReperaScreenState
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding:
+            const EdgeInsets.all(16),
         children: [
           DropdownButtonFormField<Reper>(
             initialValue: selectedReper,
@@ -147,7 +166,7 @@ class _PrzeniesienieReperaScreenState
                       DropdownMenuItem(
                     value: r,
                     child: Text(
-                      '${r.numer} (${UnitFormatter.rzedna(r.rzedna)})'
+                      '${r.numer} (${UnitFormatter.rzedna(r.rzedna)})',
                     ),
                   ),
                 )
@@ -156,7 +175,7 @@ class _PrzeniesienieReperaScreenState
               setState(() {
                 selectedReper = value;
               });
-            
+
               przelicz();
             },
           ),
@@ -166,23 +185,32 @@ class _PrzeniesienieReperaScreenState
           TextField(
             controller:
                 odczytWsteczController,
-            keyboardType:
-                TextInputType.number,
+            readOnly: true,
+            showCursor: true,
+            onTap: () {
+              setState(() {
+                aktywnyController =
+                    odczytWsteczController;
+                pokazKlawiature = true;
+              });
+            },
             decoration:
                 const InputDecoration(
               labelText:
                   'Odczyt wstecz [m]',
+              suffixIcon: Icon(
+                Icons.calculate,
+              ),
             ),
-            onChanged: (_) =>
-                przelicz(),
           ),
 
           const SizedBox(height: 20),
 
           Card(
             child: ListTile(
-              title:
-                  const Text('Oś celowa'),
+              title: const Text(
+                'Oś celowa',
+              ),
               subtitle: Text(
                 UnitFormatter.osCelowa(
                   osCelowa,
@@ -209,16 +237,41 @@ class _PrzeniesienieReperaScreenState
           TextField(
             controller:
                 odczytWPrzodController,
-            keyboardType:
-                TextInputType.number,
+            readOnly: true,
+            showCursor: true,
+            onTap: () {
+              setState(() {
+                aktywnyController =
+                    odczytWPrzodController;
+                pokazKlawiature = true;
+              });
+            },
             decoration:
                 const InputDecoration(
               labelText:
                   'Odczyt w przód [m]',
+              suffixIcon: Icon(
+                Icons.calculate,
+              ),
             ),
-            onChanged: (_) =>
-                przelicz(),
           ),
+
+          const SizedBox(height: 16),
+
+          if (pokazKlawiature &&
+              aktywnyController != null)
+            GeoNumericKeyboard(
+              controller:
+                  aktywnyController!,
+              onDone: () {
+                przelicz();
+
+                setState(() {
+                  pokazKlawiature = false;
+                  aktywnyController = null;
+                });
+              },
+            ),
 
           const SizedBox(height: 20),
 

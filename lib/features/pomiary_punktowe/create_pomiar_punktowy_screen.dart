@@ -8,6 +8,7 @@ import '../../models/pomiar_punktowy.dart';
 import '../../models/stanowisko.dart';
 import '../../models/typ_punktu.dart';
 import '../../services/persistence_service.dart';
+import '../../widgets/geo_numeric_keyboard.dart';
 
 class CreatePomiarPunktowyScreen
     extends StatefulWidget {
@@ -51,6 +52,10 @@ class _CreatePomiarPunktowyScreenState
 
   double wynik = 0;
 
+  bool pokazKlawiature = false;
+
+  TextEditingController? aktywnyController;
+
   String get kod {
     final prefix =
         KodPunktuGenerator.prefix(
@@ -93,6 +98,15 @@ class _CreatePomiarPunktowyScreenState
     }
 
     setState(() {});
+  }
+
+  @override
+  void dispose() {
+    numerController.dispose();
+    opisController.dispose();
+    odczytController.dispose();
+    rzednaController.dispose();
+    super.dispose();
   }
 
   Future<void> zapisz() async {
@@ -299,6 +313,14 @@ class _CreatePomiarPunktowyScreenState
               setState(() {
                 trybOdczytNaRzedna =
                     value.first;
+
+                pokazKlawiature = false;
+                aktywnyController = null;
+
+                odczytController.clear();
+                rzednaController.clear();
+
+                wynik = 0;
               });
 
               przelicz();
@@ -309,31 +331,61 @@ class _CreatePomiarPunktowyScreenState
 
           if (trybOdczytNaRzedna)
             TextField(
-              controller:
-                  odczytController,
-              keyboardType: TextInputType.text,
-              decoration:
-                  const InputDecoration(
-                labelText:
-                    'Odczyt [m]',
+              controller: odczytController,
+              readOnly: true,
+              showCursor: true,
+              onTap: () {
+                setState(() {
+                  aktywnyController =
+                      odczytController;
+                  pokazKlawiature = true;
+                });
+              },
+              decoration: const InputDecoration(
+                labelText: 'Odczyt [m]',
+                suffixIcon: Icon(
+                  Icons.calculate,
+                ),
               ),
-              onChanged: (_) =>
-                  przelicz(),
             ),
 
           if (!trybOdczytNaRzedna)
             TextField(
-              controller:
-                  rzednaController,
-              keyboardType: TextInputType.text,
-              decoration:
-                  const InputDecoration(
+              controller: rzednaController,
+              readOnly: true,
+              showCursor: true,
+              onTap: () {
+                setState(() {
+                  aktywnyController =
+                      rzednaController;
+                  pokazKlawiature = true;
+                });
+              },
+              decoration: const InputDecoration(
                 labelText:
                     'Rzędna [m n.p.m.]',
+                suffixIcon: Icon(
+                  Icons.calculate,
+                ),
               ),
-              onChanged: (_) =>
-                  przelicz(),
             ),
+
+          const SizedBox(height: 20),
+
+                    if (pokazKlawiature &&
+                      aktywnyController != null)
+                    GeoNumericKeyboard(
+                      controller:
+                          aktywnyController!,
+                      onDone: () {
+                        przelicz();
+
+                        setState(() {
+                          pokazKlawiature = false;
+                          aktywnyController = null;
+                        });
+                      },
+                    ),
 
           const SizedBox(height: 20),
 

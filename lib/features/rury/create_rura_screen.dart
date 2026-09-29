@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/odcinek.dart';
 import '../../models/rura.dart';
 import '../../services/persistence_service.dart';
+import '../../widgets/geo_numeric_keyboard.dart';
 
 class CreateRuraScreen extends StatefulWidget {
   final Odcinek odcinek;
@@ -47,6 +48,10 @@ class _CreateRuraScreenState
   double rzednaPoczatku = 0;
 
   double rzednaKonca = 0;
+
+  bool pokazKlawiature = false;
+
+  TextEditingController? aktywnyController;
 
   void przelicz() {
     final dlugosc =
@@ -117,6 +122,16 @@ class _CreateRuraScreenState
     }
 
     setState(() {});
+  }
+
+  @override
+  void dispose() {
+    nazwaController.dispose();
+    dlugoscController.dispose();
+    spadekController.dispose();
+    odczytStartController.dispose();
+    odczytKoniecController.dispose();
+    super.dispose();
   }
 
   Future<void> zapisz() async {
@@ -201,16 +216,22 @@ class _CreateRuraScreenState
           const SizedBox(height: 16),
 
           TextField(
-            controller:
-                dlugoscController,
-            keyboardType: TextInputType.text,
-            decoration:
-                const InputDecoration(
-              labelText:
-                  'Długość rury [m]',
+            controller: dlugoscController,
+            readOnly: true,
+            showCursor: true,
+            onTap: () {
+              setState(() {
+                aktywnyController =
+                    dlugoscController;
+                pokazKlawiature = true;
+              });
+            },
+            decoration: const InputDecoration(
+              labelText: 'Długość rury [m]',
+              suffixIcon: Icon(
+                Icons.calculate,
+              ),
             ),
-            onChanged: (_) =>
-                przelicz(),
           ),
 
           const SizedBox(height: 16),
@@ -219,23 +240,30 @@ class _CreateRuraScreenState
             segments: const [
               ButtonSegment(
                 value: true,
-                label:
-                    Text('UKŁADANIE'),
+                label: Text('UKŁADANIE'),
               ),
               ButtonSegment(
                 value: false,
-                label:
-                    Text('KONTROLA'),
+                label: Text('KONTROLA'),
               ),
             ],
             selected: {
               trybUkladanie,
             },
-            onSelectionChanged:
-                (value) {
+            onSelectionChanged: (value) {
               setState(() {
                 trybUkladanie =
                     value.first;
+
+                pokazKlawiature = false;
+                aktywnyController = null;
+
+                spadekController.clear();
+                odczytKoniecController.clear();
+
+                wynikSpadku = 0;
+                wynikOdczytu = 0;
+                roznicaWysokosci = 0;
               });
 
               przelicz();
@@ -247,14 +275,23 @@ class _CreateRuraScreenState
           TextField(
             controller:
                 odczytStartController,
-            keyboardType: TextInputType.text,
+            readOnly: true,
+            showCursor: true,
+            onTap: () {
+              setState(() {
+                aktywnyController =
+                    odczytStartController;
+                pokazKlawiature = true;
+              });
+            },
             decoration:
                 const InputDecoration(
               labelText:
                   'Odczyt początkowy [m]',
+              suffixIcon: Icon(
+                Icons.calculate,
+              ),
             ),
-            onChanged: (_) =>
-                przelicz(),
           ),
 
           const SizedBox(height: 16),
@@ -263,28 +300,67 @@ class _CreateRuraScreenState
             TextField(
               controller:
                   spadekController,
-              keyboardType: TextInputType.text,
+              readOnly: true,
+              showCursor: true,
+              onTap: () {
+                setState(() {
+                  aktywnyController =
+                      spadekController;
+                  pokazKlawiature =
+                      true;
+                });
+              },
               decoration:
                   const InputDecoration(
                 labelText:
                     'Projektowany spadek [%]',
+                suffixIcon: Icon(
+                  Icons.calculate,
+                ),
               ),
-              onChanged: (_) =>
-                  przelicz(),
             ),
 
           if (!trybUkladanie)
             TextField(
               controller:
                   odczytKoniecController,
-              keyboardType: TextInputType.text,
+              readOnly: true,
+              showCursor: true,
+              onTap: () {
+                setState(() {
+                  aktywnyController =
+                      odczytKoniecController;
+                  pokazKlawiature =
+                      true;
+                });
+              },
               decoration:
                   const InputDecoration(
                 labelText:
                     'Odczyt końcowy [m]',
+                suffixIcon: Icon(
+                  Icons.calculate,
+                ),
               ),
-              onChanged: (_) =>
-                  przelicz(),
+            ),
+
+          const SizedBox(height: 16),
+
+          if (pokazKlawiature &&
+              aktywnyController != null)
+            GeoNumericKeyboard(
+              controller:
+                  aktywnyController!,
+              onDone: () {
+                przelicz();
+
+                setState(() {
+                  pokazKlawiature =
+                      false;
+                  aktywnyController =
+                      null;
+                });
+              },
             ),
 
           const SizedBox(height: 16),

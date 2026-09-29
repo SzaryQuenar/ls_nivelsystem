@@ -162,8 +162,7 @@ class _CreateReperScreenState
                   rzednaController,
               onDone: () {
                 setState(() {
-                  pokazKlawiature =
-                      false;
+                  pokazKlawiature = false;
                 });
               },
             ),

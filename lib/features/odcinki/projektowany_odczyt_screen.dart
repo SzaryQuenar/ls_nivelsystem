@@ -30,6 +30,8 @@ class _ProjektowanyOdczytScreenState
 
   bool spadekMalejacy = true;
 
+  bool pokazKlawiature = false;
+
   void przelicz() {
     final odczytStart =
         double.tryParse(
@@ -56,6 +58,12 @@ class _ProjektowanyOdczytScreenState
   }
 
   @override
+  void dispose() {
+    odczytStartController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -64,7 +72,8 @@ class _ProjektowanyOdczytScreenState
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding:
+            const EdgeInsets.all(16),
         children: [
           Card(
             child: ListTile(
@@ -111,15 +120,39 @@ class _ProjektowanyOdczytScreenState
           TextField(
             controller:
                 odczytStartController,
-            keyboardType: TextInputType.text,
+            readOnly: true,
+            showCursor: true,
+            onTap: () {
+              setState(() {
+                pokazKlawiature =
+                    true;
+              });
+            },
             decoration:
                 const InputDecoration(
               labelText:
                   'Odczyt początkowy [m]',
+              suffixIcon: Icon(
+                Icons.calculate,
+              ),
             ),
-            onChanged: (_) =>
-                przelicz(),
           ),
+
+          const SizedBox(height: 12),
+
+          if (pokazKlawiature)
+            GeoNumericKeyboard(
+              controller:
+                  odczytStartController,
+              onDone: () {
+                przelicz();
+
+                setState(() {
+                  pokazKlawiature =
+                      false;
+                });
+              },
+            ),
 
           const SizedBox(height: 16),
 
