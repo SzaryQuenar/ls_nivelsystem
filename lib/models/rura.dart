@@ -9,6 +9,10 @@ class Rura {
 
   final double? odczytKoniec;
 
+  final double? rzednaPoczatek;
+
+  final double? rzednaKoniec;
+
   final DateTime data;
 
   Rura({
@@ -17,6 +21,8 @@ class Rura {
     required this.projektowanySpadek,
     this.odczytPoczatek,
     this.odczytKoniec,
+    this.rzednaPoczatek,
+    this.rzednaKoniec,
     required this.data,
   });
 
@@ -52,6 +58,10 @@ class Rura {
           odczytPoczatek,
       'odczytKoniec':
           odczytKoniec,
+      'rzednaPoczatek':
+          rzednaPoczatek,
+      'rzednaKoniec':
+          rzednaKoniec,
       'data': data.toIso8601String(),
     };
   }
@@ -80,6 +90,20 @@ class Rura {
                   null
               ? null
               : (json['odczytKoniec']
+                      as num)
+                  .toDouble(),
+      rzednaPoczatek:
+          json['rzednaPoczatek'] ==
+                  null
+              ? null
+              : (json['rzednaPoczatek']
+                      as num)
+                  .toDouble(),
+      rzednaKoniec:
+          json['rzednaKoniec'] ==
+                  null
+              ? null
+              : (json['rzednaKoniec']
                       as num)
                   .toDouble(),
       data: DateTime.parse(

@@ -330,7 +330,9 @@ class _CreatePomiarScreenState
             controller:
                 odczytController,
             keyboardType:
-                TextInputType.number,
+                const TextInputType.numberWithOptions(
+            decimal: true,
+            ),
             decoration:
                 const InputDecoration(
               labelText:

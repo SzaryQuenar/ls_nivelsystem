@@ -219,7 +219,9 @@ class DziennikScreen extends StatelessWidget {
                                   ),
                                   subtitle: Text(
                                     '${pomiar.typ.name}\n'
-                                    'Rzędna: ${pomiar.rzedna.toStringAsFixed(3)}',
+                                    'Odczyt: ${pomiar.odczyt.toStringAsFixed(3)} m\n'
+                                    'Rzędna: ${pomiar.rzedna.toStringAsFixed(3)} m n.p.m.\n'
+                                    'OC: ${pomiar.stanowisko.osCelowa.toStringAsFixed(3)} m',
                                   ),
                                 ),
                               ),
@@ -285,16 +287,33 @@ class DziennikScreen extends StatelessWidget {
                                             Text(
                                           rura.nazwa,
                                         ),
-                                        subtitle:
-                                            Text(
+                                        subtitle: Text(
                                           'Długość: ${rura.dlugosc.toStringAsFixed(2)} m\n'
-                                          'Projekt: ${rura.projektowanySpadek.toStringAsFixed(2)} %',
+                                          'Projekt: ${rura.projektowanySpadek.toStringAsFixed(2)} %\n'
+                                          'Odczyt pocz.: ${rura.odczytPoczatek?.toStringAsFixed(3) ?? '-'}\n'
+                                          'Rzędna pocz.: ${rura.rzednaPoczatek?.toStringAsFixed(3) ?? '-'}\n'
+                                          'Odczyt końc.: ${rura.odczytKoniec?.toStringAsFixed(3) ?? '-'}\n'
+                                          'Rzędna końc.: ${rura.rzednaKoniec?.toStringAsFixed(3) ?? '-'}',
                                         ),
-                                        trailing: rura
-                                                    .spadekRzeczywisty !=
-                                                null
-                                            ? Text(
-                                                '${rura.spadekRzeczywisty!.toStringAsFixed(2)} %',
+                                        trailing: rura.spadekRzeczywisty != null
+                                            ? Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  const Text(
+                                                    'RZECZ.',
+                                                    style: TextStyle(
+                                                      fontSize: 10,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${rura.spadekRzeczywisty!.toStringAsFixed(2)}%',
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ],
                                               )
                                             : null,
                                       ),

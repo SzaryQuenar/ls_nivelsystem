@@ -87,8 +87,8 @@ class DziennikPdfService {
                         .pomiaryPunktowe
                         .where(
                           (p) =>
-                              p.stanowisko ==
-                              stanowisko,
+                              p.stanowisko.numer ==
+                              stanowisko.numer,
                         )
                         .toList();
 
@@ -96,8 +96,8 @@ class DziennikPdfService {
                     budowa.odcinki
                         .where(
                           (o) =>
-                              o.stanowisko ==
-                              stanowisko,
+                              o.stanowisko.numer ==
+                              stanowisko.numer,
                         )
                         .toList();
 
@@ -136,86 +136,125 @@ class DziennikPdfService {
                       pw.SizedBox(height: 10),
 
                       ...Branza.values.map(
-                        (branza) {
-                          final pomiaryBranzy =
-                              pomiary
-                                  .where(
-                                    (p) =>
-                                        p.branza ==
-                                        branza,
-                                  )
-                                  .toList();
+                          (branza) {
+                            final pomiaryBranzy =
+                                pomiary
+                                    .where(
+                                      (p) =>
+                                          p.branza ==
+                                          branza,
+                                    )
+                                    .toList();
 
-                          final odcinkiBranzy =
-                              odcinki
-                                  .where(
-                                    (o) =>
-                                        o.branza ==
-                                        branza,
-                                  )
-                                  .toList();
+                            final odcinkiBranzy =
+                                odcinki
+                                    .where(
+                                      (o) =>
+                                          o.branza ==
+                                          branza,
+                                    )
+                                    .toList();
 
-                          if (pomiaryBranzy
-                                  .isEmpty &&
-                              odcinkiBranzy
-                                  .isEmpty) {
-                            return pw.SizedBox();
-                          }
+                            if (pomiaryBranzy
+                                    .isEmpty &&
+                                odcinkiBranzy
+                                    .isEmpty) {
+                              return pw.SizedBox();
+                            }
 
-                          return pw.Container(
-                            margin:
-                                const pw.EdgeInsets.only(
-                              top: 10,
-                            ),
-                            padding:
-                                const pw.EdgeInsets.all(
-                              8,
-                            ),
-                            decoration:
-                                pw.BoxDecoration(
-                              border:
-                                  pw.Border.all(),
-                            ),
-                            child: pw.Column(
-                              crossAxisAlignment:
-                                  pw.CrossAxisAlignment
-                                      .start,
-                              children: [
-                                pw.Text(
-                                  BranzaFormatter
-                                      .nazwa(
-                                    branza,
-                                  ),
-                                  style:
-                                      pw.TextStyle(
-                                    font:
-                                        bold,
-                                    fontSize:
-                                        14,
-                                  ),
-                                ),
-
-                                if (pomiaryBranzy
-                                    .isNotEmpty)
-                                  pw.Padding(
-                                    padding:
-                                        const pw.EdgeInsets.only(
-                                      top: 6,
+                            return pw.Container(
+                              margin:
+                                  const pw.EdgeInsets.only(
+                                top: 10,
+                              ),
+                              padding:
+                                  const pw.EdgeInsets.all(
+                                8,
+                              ),
+                              decoration:
+                                  pw.BoxDecoration(
+                                border:
+                                    pw.Border.all(),
+                              ),
+                              child: pw.Column(
+                                crossAxisAlignment:
+                                    pw.CrossAxisAlignment
+                                        .start,
+                                children: [
+                                  pw.Text(
+                                    BranzaFormatter
+                                        .nazwa(
+                                      branza,
                                     ),
-                                    child: pw.Text(
-                                      'PUNKTY',
-                                      style:
-                                          pw.TextStyle(
-                                        font:
-                                            bold,
+                                    style:
+                                        pw.TextStyle(
+                                      font:
+                                          bold,
+                                      fontSize:
+                                          14,
+                                    ),
+                                  ),
+
+                                  if (pomiaryBranzy
+                                      .isNotEmpty)
+                                    pw.Padding(
+                                      padding:
+                                          const pw.EdgeInsets.only(
+                                        top: 6,
+                                      ),
+                                      child: pw.Text(
+                                        'PUNKTY',
+                                        style:
+                                            pw.TextStyle(
+                                          font:
+                                              bold,
+                                        ),
                                       ),
                                     ),
-                                  ),
 
-                                ...pomiaryBranzy.map(
-                                  (pomiar) =>
+                                  ...pomiaryBranzy.map(
+                                  (pomiar) => pw.Column(
+                                    crossAxisAlignment:
+                                        pw.CrossAxisAlignment.start,
+                                    children: [
                                       pw.Text(
-                                    '• ${pomiar.kod} | rzędna: ${pomiar.rzedna.toStringAsFixed(3)}',
+                                        '• ${pomiar.kod}',
+                                      ),
+
+                                      pw.Padding(
+                                        padding:
+                                            const pw.EdgeInsets.only(
+                                          left: 15,
+                                        ),
+                                        child: pw.Text(
+                                          'Typ: ${pomiar.typ.name}',
+                                        ),
+                                      ),
+
+                                      pw.Padding(
+                                        padding:
+                                            const pw.EdgeInsets.only(
+                                          left: 15,
+                                        ),
+                                        child: pw.Text(
+                                          'Odczyt: ${pomiar.odczyt.toStringAsFixed(3)} m',
+                                        ),
+                                      ),
+
+                                      pw.Padding(
+                                        padding:
+                                            const pw.EdgeInsets.only(
+                                          left: 15,
+                                        ),
+                                        child: pw.Text(
+                                          'Rzędna: ${pomiar.rzedna.toStringAsFixed(3)} m n.p.m.',
+                                        ),
+                                      ),
+
+                                      pw.SizedBox(
+                                        height: 5,
+                                      ),
+                                    ],
                                   ),
                                 ),
 
@@ -263,9 +302,52 @@ class DziennikPdfService {
                                             left:
                                                 15,
                                           ),
-                                          child:
+                                          child: pw.Column(
+                                            crossAxisAlignment:
+                                                pw.CrossAxisAlignment.start,
+                                            children: [
                                               pw.Text(
-                                            '- ${rura.nazwa} | ${rura.dlugosc.toStringAsFixed(2)} m',
+                                                '- ${rura.nazwa}',
+                                                style: pw.TextStyle(
+                                                  font: bold,
+                                                ),
+                                              ),
+
+                                              pw.Text(
+                                                'Długość: ${rura.dlugosc.toStringAsFixed(2)} m',
+                                              ),
+
+                                              pw.Text(
+                                                'Projektowany spadek: ${rura.projektowanySpadek.toStringAsFixed(2)} %',
+                                              ),
+
+                                              if (rura.spadekRzeczywisty != null)
+                                                pw.Text(
+                                                  'Spadek rzeczywisty: ${rura.spadekRzeczywisty!.toStringAsFixed(2)} %',
+                                                ),
+
+                                              if (rura.odczytPoczatek != null)
+                                                pw.Text(
+                                                  'Odczyt początkowy: ${rura.odczytPoczatek!.toStringAsFixed(3)}',
+                                                ),
+
+                                              if (rura.rzednaPoczatek != null)
+                                                pw.Text(
+                                                  'Rzędna początkowa: ${rura.rzednaPoczatek!.toStringAsFixed(3)}',
+                                                ),
+
+                                              if (rura.odczytKoniec != null)
+                                                pw.Text(
+                                                  'Odczyt końcowy: ${rura.odczytKoniec!.toStringAsFixed(3)}',
+                                                ),
+
+                                              if (rura.rzednaKoniec != null)
+                                                pw.Text(
+                                                  'Rzędna końcowa: ${rura.rzednaKoniec!.toStringAsFixed(3)}',
+                                                ),
+
+                                              pw.SizedBox(height: 5),
+                                            ],
                                           ),
                                         ),
                                       ),

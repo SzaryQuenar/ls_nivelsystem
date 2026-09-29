@@ -312,7 +312,9 @@ class _CreatePomiarPunktowyScreenState
               controller:
                   odczytController,
               keyboardType:
-                  TextInputType.number,
+                  const TextInputType.numberWithOptions(
+              decimal: true,
+              ),
               decoration:
                   const InputDecoration(
                 labelText:
@@ -327,7 +329,9 @@ class _CreatePomiarPunktowyScreenState
               controller:
                   rzednaController,
               keyboardType:
-                  TextInputType.number,
+                  const TextInputType.numberWithOptions(
+              decimal: true,
+              ),
               decoration:
                   const InputDecoration(
                 labelText:

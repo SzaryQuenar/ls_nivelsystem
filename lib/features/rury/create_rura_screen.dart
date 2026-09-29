@@ -44,6 +44,10 @@ class _CreateRuraScreenState
 
   double roznicaWysokosci = 0;
 
+  double rzednaPoczatku = 0;
+
+  double rzednaKonca = 0;
+
   void przelicz() {
     final dlugosc =
         double.tryParse(
@@ -66,6 +70,12 @@ class _CreateRuraScreenState
             ) ??
             0;
 
+    final osCelowa =
+        widget.odcinek.stanowisko.osCelowa;
+
+    rzednaPoczatku =
+        osCelowa - odczytStart;
+
     if (trybUkladanie) {
       roznicaWysokosci =
           dlugosc * (spadek / 100);
@@ -79,6 +89,9 @@ class _CreateRuraScreenState
             odczytStart -
                 roznicaWysokosci;
       }
+
+      rzednaKonca =
+          osCelowa - wynikOdczytu;
     } else {
       final odczytKoniec =
           double.tryParse(
@@ -94,6 +107,13 @@ class _CreateRuraScreenState
                     dlugosc) *
                 100;
       }
+
+      rzednaKonca =
+          osCelowa - odczytKoniec;
+
+      roznicaWysokosci =
+          rzednaPoczatku -
+              rzednaKonca;
     }
 
     setState(() {});
@@ -136,6 +156,10 @@ class _CreateRuraScreenState
                 odczytKoniecController.text
                     .replaceAll(',', '.'),
               ),
+        rzednaPoczatek:
+            rzednaPoczatku,
+        rzednaKoniec:
+            rzednaKonca,
         data: DateTime.now(),
       ),
     );
@@ -180,7 +204,9 @@ class _CreateRuraScreenState
             controller:
                 dlugoscController,
             keyboardType:
-                TextInputType.number,
+                const TextInputType.numberWithOptions(
+              decimal: true,
+              ),
             decoration:
                 const InputDecoration(
               labelText:
@@ -225,7 +251,9 @@ class _CreateRuraScreenState
             controller:
                 odczytStartController,
             keyboardType:
-                TextInputType.number,
+                const TextInputType.numberWithOptions(
+              decimal: true,
+              ),
             decoration:
                 const InputDecoration(
               labelText:
@@ -242,7 +270,9 @@ class _CreateRuraScreenState
               controller:
                   spadekController,
               keyboardType:
-                  TextInputType.number,
+                  const TextInputType.numberWithOptions(
+              decimal: true,
+              ),
               decoration:
                   const InputDecoration(
                 labelText:
@@ -257,7 +287,9 @@ class _CreateRuraScreenState
               controller:
                   odczytKoniecController,
               keyboardType:
-                  TextInputType.number,
+                  const TextInputType.numberWithOptions(
+              decimal: true,
+              ),
               decoration:
                   const InputDecoration(
                 labelText:
@@ -327,6 +359,40 @@ class _CreateRuraScreenState
             ),
 
           const SizedBox(height: 24),
+
+          Card(
+            child: ListTile(
+              title: const Text(
+                'Oś celowa',
+              ),
+              subtitle: Text(
+                widget.odcinek.stanowisko.osCelowa
+                    .toStringAsFixed(3),
+              ),
+            ),
+          ),
+
+          Card(
+            child: ListTile(
+              title: const Text(
+                'Rzędna początku',
+              ),
+              subtitle: Text(
+                '${rzednaPoczatku.toStringAsFixed(3)} m n.p.m.',
+              ),
+            ),
+          ),
+
+          Card(
+            child: ListTile(
+              title: const Text(
+                'Rzędna końca',
+              ),
+              subtitle: Text(
+                '${rzednaKonca.toStringAsFixed(3)} m n.p.m.',
+              ),
+            ),
+          ),
 
           FilledButton.icon(
             onPressed: zapisz,

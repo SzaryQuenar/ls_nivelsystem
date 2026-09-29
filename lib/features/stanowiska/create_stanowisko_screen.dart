@@ -174,7 +174,9 @@ class _CreateStanowiskoScreenState
             controller:
                 odczytWsteczController,
             keyboardType:
-                TextInputType.number,
+                const TextInputType.numberWithOptions(
+            decimal: true,
+            ),
             decoration:
                 const InputDecoration(
               labelText:

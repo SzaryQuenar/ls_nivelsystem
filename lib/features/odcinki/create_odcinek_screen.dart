@@ -304,7 +304,9 @@ class _CreateOdcinekScreenState
             controller:
                 dlugoscController,
             keyboardType:
-                TextInputType.number,
+                const TextInputType.numberWithOptions(
+              decimal: true,
+              ),
             decoration:
                 const InputDecoration(
               labelText:
@@ -318,7 +320,9 @@ class _CreateOdcinekScreenState
             controller:
                 spadekController,
             keyboardType:
-                TextInputType.number,
+                const TextInputType.numberWithOptions(
+            decimal: true,
+            ),
             decoration:
                 const InputDecoration(
               labelText:

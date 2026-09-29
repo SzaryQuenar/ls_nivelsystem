@@ -108,7 +108,9 @@ class _CreateReperScreenState
           TextField(
             controller: rzednaController,
             keyboardType:
-                TextInputType.number,
+                const TextInputType.numberWithOptions(
+            decimal: true,
+            ),
             decoration:
                 const InputDecoration(
               labelText: 'Rzędna [m n.p.m.]',
