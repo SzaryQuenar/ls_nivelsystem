@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/budowa.dart';
 import '../../models/reper.dart';
 import '../../services/persistence_service.dart';
+import '../../widgets/geo_numeric_keyboard.dart';
 
 class CreateReperScreen extends StatefulWidget {
   final Budowa budowa;
@@ -27,49 +28,73 @@ class _CreateReperScreenState
 
   ReperTyp typ = ReperTyp.rg;
 
+  bool pokazKlawiature = false;
+
   String getNextNumber() {
-  final prefix =
-      typ == ReperTyp.rg ? 'RG' : 'RR';
+    final prefix =
+        typ == ReperTyp.rg
+            ? 'RG'
+            : 'RR';
 
-  int maxNumer = 0;
+    int maxNumer = 0;
 
-  for (final reper in widget.budowa.repery) {
-    if (reper.typ != typ) continue;
+    for (final reper in widget.budowa.repery) {
+      if (reper.typ != typ) {
+        continue;
+      }
 
-    final match =
-        RegExp(r'(\d+)$')
-            .firstMatch(reper.numer);
+      final match =
+          RegExp(r'(\d+)$')
+              .firstMatch(reper.numer);
 
-    if (match == null) continue;
+      if (match == null) {
+        continue;
+      }
 
-    final numer =
-        int.tryParse(match.group(1)!) ?? 0;
+      final numer =
+          int.tryParse(
+                match.group(1)!,
+              ) ??
+              0;
 
-    if (numer > maxNumer) {
-      maxNumer = numer;
+      if (numer > maxNumer) {
+        maxNumer = numer;
+      }
     }
+
+    return '$prefix${maxNumer + 1}';
   }
 
-  return '$prefix${maxNumer + 1}';
-}
+  @override
+  void dispose() {
+    rzednaController.dispose();
+    opisController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nowy Reper'),
+        title: const Text(
+          'Nowy Reper',
+        ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding:
+            const EdgeInsets.all(16),
         children: [
           Card(
             child: ListTile(
-              title: const Text('Numer repera'),
+              title: const Text(
+                'Numer repera',
+              ),
               subtitle: Text(
                 getNextNumber(),
                 style: const TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontWeight:
+                      FontWeight.bold,
                 ),
               ),
             ),
@@ -77,10 +102,13 @@ class _CreateReperScreenState
 
           const SizedBox(height: 16),
 
-          DropdownButtonFormField<ReperTyp>(
+          DropdownButtonFormField<
+              ReperTyp>(
             initialValue: typ,
-            decoration: const InputDecoration(
-              labelText: 'Typ repera',
+            decoration:
+                const InputDecoration(
+              labelText:
+                  'Typ repera',
             ),
             items: const [
               DropdownMenuItem(
@@ -106,18 +134,45 @@ class _CreateReperScreenState
           const SizedBox(height: 16),
 
           TextField(
-            controller: rzednaController,
-            keyboardType: TextInputType.text,
+            controller:
+                rzednaController,
+            readOnly: true,
+            showCursor: true,
+            onTap: () {
+              setState(() {
+                pokazKlawiature =
+                    true;
+              });
+            },
             decoration:
                 const InputDecoration(
-              labelText: 'Rzędna [m n.p.m.]',
+              labelText:
+                  'Rzędna [m n.p.m.]',
+              suffixIcon: Icon(
+                Icons.calculate,
+              ),
             ),
           ),
+
+          const SizedBox(height: 12),
+
+          if (pokazKlawiature)
+            GeoNumericKeyboard(
+              controller:
+                  rzednaController,
+              onDone: () {
+                setState(() {
+                  pokazKlawiature =
+                      false;
+                });
+              },
+            ),
 
           const SizedBox(height: 16),
 
           TextField(
-            controller: opisController,
+            controller:
+                opisController,
             decoration:
                 const InputDecoration(
               labelText: 'Opis',
@@ -130,19 +185,27 @@ class _CreateReperScreenState
             onPressed: () async {
               widget.budowa.repery.add(
                 Reper(
-                  numer: getNextNumber(),
+                  numer:
+                      getNextNumber(),
                   typ: typ,
                   rzedna:
                       double.tryParse(
-                            rzednaController.text
-                                .replaceAll(',', '.'),
+                            rzednaController
+                                .text
+                                .replaceAll(
+                                  ',',
+                                  '.',
+                                ),
                           ) ??
                           0,
-                  opis: opisController.text,
+                  opis:
+                      opisController
+                          .text,
                 ),
               );
 
-              await PersistenceService.save();
+              await PersistenceService
+                  .save();
 
               if (!context.mounted) {
                 return;
