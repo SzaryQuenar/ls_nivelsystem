@@ -183,27 +183,23 @@ class _CreateStanowiskoScreenState
 
           const SizedBox(height: 16),
 
-          TextField(
-            controller:
-                odczytWsteczController,
-            readOnly: true,
-            showCursor: true,
+          GestureDetector(
             onTap: () {
               setState(() {
-                pokazKlawiature =
-                    true;
+                pokazKlawiature = true;
               });
             },
-            decoration:
-                const InputDecoration(
-              labelText:
-                  'Odczyt wstecz [m]',
-              suffixIcon: Icon(
-                Icons.calculate,
+            child: AbsorbPointer(
+              child: TextField(
+                controller: odczytWsteczController,
+                decoration: const InputDecoration(
+                  labelText: 'Odczyt wstecz [m]',
+                  suffixIcon: Icon(Icons.calculate),
+                ),
               ),
             ),
-          ),
-
+          ),            
+          
           const SizedBox(height: 12),
 
           if (pokazKlawiature)

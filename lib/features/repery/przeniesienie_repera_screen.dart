@@ -182,11 +182,7 @@ class _PrzeniesienieReperaScreenState
 
           const SizedBox(height: 16),
 
-          TextField(
-            controller:
-                odczytWsteczController,
-            readOnly: true,
-            showCursor: true,
+          GestureDetector(
             onTap: () {
               setState(() {
                 aktywnyController =
@@ -194,12 +190,15 @@ class _PrzeniesienieReperaScreenState
                 pokazKlawiature = true;
               });
             },
-            decoration:
-                const InputDecoration(
-              labelText:
-                  'Odczyt wstecz [m]',
-              suffixIcon: Icon(
-                Icons.calculate,
+            child: AbsorbPointer(
+              child: TextField(
+                controller: odczytWsteczController,
+                decoration: const InputDecoration(
+                  labelText: 'Odczyt wstecz [m]',
+                  suffixIcon: Icon(
+                    Icons.calculate,
+                  ),
+                ),
               ),
             ),
           ),
@@ -234,11 +233,7 @@ class _PrzeniesienieReperaScreenState
 
           const SizedBox(height: 16),
 
-          TextField(
-            controller:
-                odczytWPrzodController,
-            readOnly: true,
-            showCursor: true,
+          GestureDetector(
             onTap: () {
               setState(() {
                 aktywnyController =
@@ -246,16 +241,19 @@ class _PrzeniesienieReperaScreenState
                 pokazKlawiature = true;
               });
             },
-            decoration:
-                const InputDecoration(
-              labelText:
-                  'Odczyt w przód [m]',
-              suffixIcon: Icon(
-                Icons.calculate,
+            child: AbsorbPointer(
+              child: TextField(
+                controller: odczytWPrzodController,
+                decoration: const InputDecoration(
+                  labelText: 'Odczyt w przód [m]',
+                  suffixIcon: Icon(
+                    Icons.calculate,
+                  ),
+                ),
               ),
             ),
           ),
-
+          
           const SizedBox(height: 16),
 
           if (pokazKlawiature &&
